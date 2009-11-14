@@ -40,6 +40,15 @@ describe Refraction do
       response[0].should == 301
       response[1]['Location'].should == "http://yes.com/"
     end
+
+    it "should extract the query string" do
+      env = Rack::MockRequest.env_for('http://bar.com', :method => 'get')
+      env['PATH_INFO'] = '/?foo=bar'
+      app = mock('app')
+      response = Refraction.new(app).call(env)
+      response[0].should == 301
+      response[1]['Location'].should == "http://yes.com/"
+    end
   end
 
   describe "permanent redirection" do

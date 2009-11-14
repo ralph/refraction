@@ -14,6 +14,12 @@ class Refraction
       hostname = env['HTTP_HOST'].split(':').first if env['HTTP_HOST']
       env_path = env['PATH_INFO'] || env['REQUEST_PATH']
 
+      if !env['QUERY_STRING'] || env['QUERY_STRING'].empty?
+        env_path, query_string = env_path.split("?")
+      else
+        query_string = env['QUERY_STRING']
+      end
+
       @uri = URI::Generic.build(
         :scheme => env['rack.url_scheme'],
         :host   => hostname,
@@ -22,7 +28,7 @@ class Refraction
       unless [URI::HTTP::DEFAULT_PORT, URI::HTTPS::DEFAULT_PORT].include?(env['SERVER_PORT'].to_i)
         @uri.port = env['SERVER_PORT']
       end
-      @uri.query = env['QUERY_STRING'] if env['QUERY_STRING'] && !env['QUERY_STRING'].empty?
+      @uri.query = query_string if query_string && !query_string.empty?
     end
 
     def response
